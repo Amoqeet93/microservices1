@@ -1,5 +1,6 @@
 package com.eazybytes.accounts.repository;
 
+import com.eazybytes.accounts.dto.CustomerDto;
 import com.eazybytes.accounts.model.Accounts;
 import org.springframework.data.jpa.repository.JpaRepository;
 

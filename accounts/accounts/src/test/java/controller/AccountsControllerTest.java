@@ -2,13 +2,21 @@ package controller;
 
 import com.eazybytes.accounts.controller.AccountsController;
 import com.eazybytes.accounts.dto.CustomerDto;
+import com.eazybytes.accounts.model.Customer;
+import com.eazybytes.accounts.repository.AccountsRepository;
+import com.eazybytes.accounts.repository.CustomerRepository;
+import com.eazybytes.accounts.service.IAccountsService;
+import com.eazybytes.accounts.service.impl.AccountServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -23,14 +31,8 @@ class AccountsControllerTest {
     @Autowired
     ObjectMapper objectMapper;
 
-    @Test
-    public void getHelloTest() throws Exception {
-
-        mockMvc.perform(get("/api/hello"))
-                .andExpectAll(
-                content().string("Hello World"));
-
-    }
+    @MockitoBean
+    AccountServiceImpl accountService;
 
     @Test
     public void shouldCreateAccount() throws Exception {
@@ -45,6 +47,23 @@ class AccountsControllerTest {
                 jsonPath("$.statusCode").value("201"),
                 jsonPath("$.statusMsg").value("Account created successfully")
         );
+    }
+
+    @Test
+    public void shouldCreateAccount1() throws Exception{
+        CustomerDto customerDto = new CustomerDto("Moqeet", "moqeet@example.com", "01212");
+
+        doNothing().when(accountService).createAccount(any(CustomerDto.class));
+
+        mockMvc.perform(post("/api/create")
+                .content(objectMapper.writeValueAsString(customerDto))
+                        .contentType(MediaType.APPLICATION_JSON)
+                )
+                .andExpectAll(
+                        status().isCreated(),
+                        jsonPath("$.statusCode").value("201"),
+                        jsonPath("$.statusMsg").value("Account created successfully")
+                );
     }
 
 //    @Test
