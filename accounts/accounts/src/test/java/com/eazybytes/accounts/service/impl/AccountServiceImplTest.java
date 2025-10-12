@@ -1,6 +1,7 @@
 package com.eazybytes.accounts.service.impl;
 
 import com.eazybytes.accounts.dto.CustomerDto;
+import com.eazybytes.accounts.exception.CustomerAlreadyExistsException;
 import com.eazybytes.accounts.model.Accounts;
 import com.eazybytes.accounts.model.Customer;
 import com.eazybytes.accounts.repository.AccountsRepository;
@@ -10,6 +11,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+
+import java.util.Optional;
+
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -37,6 +42,23 @@ class AccountServiceImplTest {
 
         verify(customerRepository, times(1)).save(any(Customer.class));
         verify(accountsRepository, times(1)).save(any(Accounts.class));
+    }
+
+    @Test
+    public void shouldThrowErrorWhenCustomerAlreadyExists() throws Exception{
+        CustomerDto customerDto = new CustomerDto("Moqeet", "moqeet@example.com", "01212");
+        Customer existingCustomer = new Customer(123L, "Moqeet", "moqeet@example.com", "01212");
+
+        when(customerRepository.findByMobileNumber(customerDto.getMobileNumber()))
+                .thenReturn(Optional.of(existingCustomer));
+
+        assertThrows(
+                CustomerAlreadyExistsException.class,
+                () -> accountService.createAccount(customerDto)
+        );
+
+        verify(customerRepository, never()).save(any(Customer.class));
+        verify(accountsRepository, never()).save(any(Accounts.class));
     }
 
 }
