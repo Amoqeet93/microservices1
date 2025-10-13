@@ -1,5 +1,6 @@
 package com.eazybytes.accounts.service.impl;
 
+import com.eazybytes.accounts.dto.AccountsDto;
 import com.eazybytes.accounts.dto.CustomerDto;
 import com.eazybytes.accounts.exception.CustomerAlreadyExistsException;
 import com.eazybytes.accounts.model.Accounts;
@@ -14,7 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
@@ -33,7 +34,7 @@ class AccountServiceImplTest {
 
     @Test
     public void shouldCreateAccount() throws Exception {
-        CustomerDto customerDto = new CustomerDto("Moqeet", "moqeet@example.com", "01212");
+        CustomerDto customerDto = new CustomerDto();
         Customer savedCustomer = new Customer();
 
         when(customerRepository.save(any(Customer.class))).thenReturn(savedCustomer);
@@ -45,9 +46,9 @@ class AccountServiceImplTest {
     }
 
     @Test
-    public void shouldThrowErrorWhenCustomerAlreadyExists() throws Exception{
-        CustomerDto customerDto = new CustomerDto("Moqeet", "moqeet@example.com", "01212");
-        Customer existingCustomer = new Customer(123L, "Moqeet", "moqeet@example.com", "01212");
+    public void shouldThrowErrorWhenCustomerAlreadyExists() throws CustomerAlreadyExistsException{
+        CustomerDto customerDto = new CustomerDto();
+        Customer existingCustomer = new Customer();
 
         when(customerRepository.findByMobileNumber(customerDto.getMobileNumber()))
                 .thenReturn(Optional.of(existingCustomer));
@@ -59,6 +60,27 @@ class AccountServiceImplTest {
 
         verify(customerRepository, never()).save(any(Customer.class));
         verify(accountsRepository, never()).save(any(Accounts.class));
+    }
+
+    @Test
+    public void shouldGetAccount_WhenCustomerExists() throws Exception{
+        //Given
+        Customer customer = new Customer();
+        customer.setCustomerId(1L);
+        customer.setMobileNumber("0121");
+
+        Accounts accounts = new Accounts();
+        accounts.setAccountNumber(123L);
+        accounts.setCustomerId(1L);
+
+        when(customerRepository.findByMobileNumber(customer.getMobileNumber())).thenReturn(Optional.of(customer));
+        when(accountsRepository.findByCustomerId(customer.getCustomerId())).thenReturn(Optional.of(accounts));
+
+        CustomerDto result = accountService.fetchAccount(customer.getMobileNumber());
+
+        assertNotNull(result);
+        verify(customerRepository).findByMobileNumber(customer.getMobileNumber());
+        verify(accountsRepository).findByCustomerId(customer.getCustomerId());
     }
 
 }
