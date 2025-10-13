@@ -2,6 +2,7 @@ package controller;
 
 import com.eazybytes.accounts.controller.AccountsController;
 import com.eazybytes.accounts.dto.CustomerDto;
+import com.eazybytes.accounts.exception.ResourceNotFoundException;
 import com.eazybytes.accounts.service.impl.AccountServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
@@ -29,21 +30,6 @@ class AccountsControllerTest {
 
     @MockitoBean
     AccountServiceImpl accountService;
-
-    @Test
-    public void shouldCreateAccount() throws Exception {
-
-        CustomerDto customerDto = new CustomerDto();
-
-        mockMvc.perform(post("/api/create")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(customerDto))
-        ).andExpectAll(
-                status().isCreated(),
-                jsonPath("$.statusCode").value("201"),
-                jsonPath("$.statusMsg").value("Account created successfully")
-        );
-    }
 
     @Test
     public void shouldCreateAccount1() throws Exception {
@@ -74,8 +60,11 @@ class AccountsControllerTest {
         ).andExpectAll(
                 status().isOk()
         );
-
     }
+
+
+
+
 
 
 }

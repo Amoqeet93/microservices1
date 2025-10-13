@@ -3,6 +3,7 @@ package com.eazybytes.accounts.service.impl;
 import com.eazybytes.accounts.dto.AccountsDto;
 import com.eazybytes.accounts.dto.CustomerDto;
 import com.eazybytes.accounts.exception.CustomerAlreadyExistsException;
+import com.eazybytes.accounts.exception.ResourceNotFoundException;
 import com.eazybytes.accounts.model.Accounts;
 import com.eazybytes.accounts.model.Customer;
 import com.eazybytes.accounts.repository.AccountsRepository;
@@ -12,12 +13,15 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.MediaType;
 
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -81,6 +85,35 @@ class AccountServiceImplTest {
         assertNotNull(result);
         verify(customerRepository).findByMobileNumber(customer.getMobileNumber());
         verify(accountsRepository).findByCustomerId(customer.getCustomerId());
+    }
+
+    @Test
+    public void shouldThrowResourceNotFoundErrorWhenCustomerNotFound () throws ResourceNotFoundException {
+        String mobileNumber = "0121";
+
+        when(customerRepository.findByMobileNumber(mobileNumber)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception =
+                assertThrows(ResourceNotFoundException.class,
+                () -> accountService.fetchAccount("0121"));
+
+        assertEquals("Customer not found with the given input data mobileNumber : '0121'", exception.getMessage());
+    }
+
+    @Test
+    public void shouldThrowResourceNotFoundExceptionWhenAccountNotFound() throws ResourceNotFoundException{
+        //Given
+        Customer customer = new Customer();
+        customer.setCustomerId(123L);
+        customer.setMobileNumber("0121");
+
+        when(customerRepository.findByMobileNumber(customer.getMobileNumber())).thenReturn(Optional.of(customer));
+        when(accountsRepository.findByCustomerId(customer.getCustomerId())).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception =
+                assertThrows(ResourceNotFoundException.class, () -> accountService.fetchAccount(customer.getMobileNumber()));
+
+        assertEquals("Account not found with the given input data customerId : '123'", exception.getMessage());
     }
 
 }
