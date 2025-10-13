@@ -68,7 +68,6 @@ class AccountServiceImplTest {
 
     @Test
     public void shouldGetAccount_WhenCustomerExists() throws Exception{
-        //Given
         Customer customer = new Customer();
         customer.setCustomerId(1L);
         customer.setMobileNumber("0121");
@@ -102,7 +101,6 @@ class AccountServiceImplTest {
 
     @Test
     public void shouldThrowResourceNotFoundExceptionWhenAccountNotFound() throws ResourceNotFoundException{
-        //Given
         Customer customer = new Customer();
         customer.setCustomerId(123L);
         customer.setMobileNumber("0121");
