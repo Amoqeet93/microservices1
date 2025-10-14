@@ -114,4 +114,34 @@ class AccountServiceImplTest {
         assertEquals("Account not found with the given input data customerId : '123'", exception.getMessage());
     }
 
+    @Test
+    public void accountUpdatedSuccessfully() throws Exception {
+        //Given
+        //Need both the account and customer objects
+        CustomerDto customerDto = new CustomerDto();
+
+        AccountsDto accountsDto = new AccountsDto();
+        accountsDto.setAccountNumber(2L);
+        customerDto.setAccountsDto(accountsDto);
+
+        Accounts accounts = new Accounts();
+        accounts.setCustomerId(1L);
+
+        Customer customer = new Customer();
+
+        //When
+        when(accountsRepository.findById(anyLong())).thenReturn(Optional.of(accounts));
+        when(customerRepository.findById(anyLong())).thenReturn(Optional.of(customer));
+        //Need to save as it's an update
+        when(accountsRepository.save(any(Accounts.class))).thenReturn(accounts);
+        when(customerRepository.save(any(Customer.class))).thenReturn(customer);
+
+        boolean result = accountService.updateAccount(customerDto);
+
+        //Then
+        assertEquals(result, true);
+    }
+
+
+
 }

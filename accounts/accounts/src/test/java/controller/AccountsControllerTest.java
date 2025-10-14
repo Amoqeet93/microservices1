@@ -1,6 +1,7 @@
 package controller;
 
 import com.eazybytes.accounts.controller.AccountsController;
+import com.eazybytes.accounts.dto.AccountsDto;
 import com.eazybytes.accounts.dto.CustomerDto;
 import com.eazybytes.accounts.exception.ResourceNotFoundException;
 import com.eazybytes.accounts.service.impl.AccountServiceImpl;
@@ -13,9 +14,9 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(AccountsController.class)
@@ -57,6 +58,24 @@ class AccountsControllerTest {
         mockMvc.perform(get("/api/fetch")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("mobileNumber", "1234567890")
+        ).andExpectAll(
+                status().isOk()
+        );
+    }
+
+    @Test
+    public void shouldUpdateTheAccount() throws Exception {
+        //Given
+        //We are given an initial account
+        CustomerDto customerDto = new CustomerDto();
+
+        //When
+        when(accountService.updateAccount(customerDto)).thenReturn(true);
+
+        //Then
+        mockMvc.perform(put("/api/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(customerDto))
         ).andExpectAll(
                 status().isOk()
         );
