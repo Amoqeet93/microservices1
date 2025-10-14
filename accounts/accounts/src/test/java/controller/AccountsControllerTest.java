@@ -78,6 +78,54 @@ class AccountsControllerTest {
         );
     }
 
+    @Test
+    public void shouldThrowErrorWhenAccountNotUpdated() throws Exception{
+
+        CustomerDto customerDto = new CustomerDto();
+
+        when(accountService.updateAccount(any())).thenReturn(false);
+
+        mockMvc.perform(put("/api/update")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(customerDto))
+        ).andExpectAll(
+                status().isExpectationFailed(),
+                jsonPath("$.statusMsg").value("Update operation failed. Please try again or contact Dev team")
+        );
+
+    }
+
+    @Test
+    public void shouldDeleteAccountSuccessfully() throws Exception {
+        CustomerDto customerDto = new CustomerDto();
+
+        when(accountService.deleteAccount(anyString())).thenReturn(true);
+
+        mockMvc.perform(delete("/api/delete")
+                .contentType(MediaType.APPLICATION_JSON)
+                        .param("mobileNumber",anyString())
+                        .content(objectMapper.writeValueAsString(customerDto))
+                ).andExpectAll(
+                status().isOk(),
+                jsonPath("$.statusMsg").value("Request processed successfully")
+        );
+    }
+
+    @Test
+    public void shouldThrowErrorWhenUnsuccessful() throws Exception{
+        CustomerDto customerDto = new CustomerDto();
+
+        when(accountService.deleteAccount(anyString())).thenReturn(false);
+
+        mockMvc.perform(delete("/api/delete")
+                .param("mobileNumber", anyString())
+                .contentType(MediaType.APPLICATION_JSON)
+        ).andExpectAll(
+                status().isExpectationFailed(),
+                jsonPath("$.statusMsg").value("Delete operation failed. Please try again or contact Dev team")
+        );
+    }
+
 
 
 

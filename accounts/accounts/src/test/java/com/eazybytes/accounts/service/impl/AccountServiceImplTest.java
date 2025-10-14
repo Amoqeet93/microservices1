@@ -13,15 +13,10 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.MediaType;
-
 import java.util.Optional;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -141,6 +136,28 @@ class AccountServiceImplTest {
         //Then
         assertEquals(result, true);
     }
+
+    @Test
+    public void deleteAccountSuccessfully() throws  Exception {
+        Customer customer = new Customer();
+        customer.setCustomerId(1L);
+        customer.setMobileNumber("0123456789");
+
+        when(customerRepository.findByMobileNumber(anyString())).thenReturn(Optional.of(customer));
+
+        boolean result = accountService.deleteAccount(customer.getMobileNumber());
+
+        assertEquals(result, true);
+    }
+
+    @Test
+    public void shouldThrowErrorWhenDeletingAccount() throws Exception {
+        when(customerRepository.findByMobileNumber(anyString())).thenReturn(Optional.empty());
+
+        assertThrows(ResourceNotFoundException.class,
+                ()-> accountService.deleteAccount("02112"));
+    }
+
 
 
 
