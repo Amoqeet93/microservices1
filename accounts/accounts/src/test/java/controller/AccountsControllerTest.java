@@ -65,19 +65,16 @@ class AccountsControllerTest {
 
     @Test
     public void shouldUpdateTheAccount() throws Exception {
-        //Given
-        //We are given an initial account
         CustomerDto customerDto = new CustomerDto();
 
-        //When
         when(accountService.updateAccount(customerDto)).thenReturn(true);
 
-        //Then
         mockMvc.perform(put("/api/update")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customerDto))
         ).andExpectAll(
-                status().isOk()
+                status().isOk(),
+                jsonPath("$.statusMsg").value("Request processed successfully")
         );
     }
 
