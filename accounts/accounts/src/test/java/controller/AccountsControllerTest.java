@@ -1,6 +1,7 @@
 package controller;
 
 import com.eazybytes.accounts.controller.AccountsController;
+import com.eazybytes.accounts.dto.AccountsDto;
 import com.eazybytes.accounts.dto.CustomerDto;
 import com.eazybytes.accounts.service.impl.AccountServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,8 +13,6 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -32,15 +31,26 @@ class AccountsControllerTest {
     AccountServiceImpl accountService;
     
     CustomerDto customerDto;
+    AccountsDto accountsDto;
     
     @BeforeEach
     public void setup(){
         customerDto = new CustomerDto();
+        accountsDto = new AccountsDto();
+
+        accountsDto.setAccountNumber(1234567890L);
+        accountsDto.setAccountType("Savings");
+        accountsDto.setBranchAddress("Birmingham");
+
+
+        customerDto.setName("Moqeet");
+        customerDto.setEmail("moqeet@example.com");
+        customerDto.setMobileNumber("0123456789");
+        customerDto.setAccountsDto(accountsDto);
     }
 
     @Test
     public void shouldCreateAccount1() throws Exception {
-
         doNothing().when(accountService).createAccount(any(CustomerDto.class));
 
         mockMvc.perform(post("/api/create")
