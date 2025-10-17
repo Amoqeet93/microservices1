@@ -1,11 +1,10 @@
 package controller;
 
 import com.eazybytes.accounts.controller.AccountsController;
-import com.eazybytes.accounts.dto.AccountsDto;
 import com.eazybytes.accounts.dto.CustomerDto;
-import com.eazybytes.accounts.exception.ResourceNotFoundException;
 import com.eazybytes.accounts.service.impl.AccountServiceImpl;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -13,8 +12,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultMatcher;
 
-import static org.junit.jupiter.api.Assertions.fail;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -31,10 +30,16 @@ class AccountsControllerTest {
 
     @MockitoBean
     AccountServiceImpl accountService;
+    
+    CustomerDto customerDto;
+    
+    @BeforeEach
+    public void setup(){
+        customerDto = new CustomerDto();
+    }
 
     @Test
     public void shouldCreateAccount1() throws Exception {
-        CustomerDto customerDto = new CustomerDto();
 
         doNothing().when(accountService).createAccount(any(CustomerDto.class));
 
@@ -51,8 +56,6 @@ class AccountsControllerTest {
 
     @Test
     public void shouldGetAccount() throws Exception {
-        CustomerDto customerDto = new CustomerDto();
-
         when(accountService.fetchAccount(anyString())).thenReturn(customerDto);
 
         mockMvc.perform(get("/api/fetch")
@@ -65,7 +68,6 @@ class AccountsControllerTest {
 
     @Test
     public void shouldUpdateTheAccount() throws Exception {
-        CustomerDto customerDto = new CustomerDto();
 
         when(accountService.updateAccount(customerDto)).thenReturn(true);
 
@@ -81,8 +83,6 @@ class AccountsControllerTest {
     @Test
     public void shouldThrowErrorWhenAccountNotUpdated() throws Exception{
 
-        CustomerDto customerDto = new CustomerDto();
-
         when(accountService.updateAccount(any())).thenReturn(false);
 
         mockMvc.perform(put("/api/update")
@@ -97,7 +97,6 @@ class AccountsControllerTest {
 
     @Test
     public void shouldDeleteAccountSuccessfully() throws Exception {
-        CustomerDto customerDto = new CustomerDto();
 
         when(accountService.deleteAccount(anyString())).thenReturn(true);
 
@@ -113,7 +112,6 @@ class AccountsControllerTest {
 
     @Test
     public void shouldThrowErrorWhenUnsuccessful() throws Exception{
-        CustomerDto customerDto = new CustomerDto();
 
         when(accountService.deleteAccount(anyString())).thenReturn(false);
 
