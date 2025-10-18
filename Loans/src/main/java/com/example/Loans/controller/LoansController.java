@@ -8,9 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(value = "/api", produces = {MediaType.APPLICATION_JSON_VALUE})
@@ -21,10 +19,11 @@ public class LoansController {
     private LoansServiceImpl loansService;
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseDto> createLoan(String mobileNumber){
+    public ResponseEntity<ResponseDto> createLoan(@RequestParam String mobileNumber){
+        loansService.createLoan(mobileNumber);
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(new ResponseDto(LoanConstants.MESSAGE_201, LoanConstants.STATUS_201));
-
     }
+
 }

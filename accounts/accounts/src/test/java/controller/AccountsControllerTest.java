@@ -50,7 +50,7 @@ class AccountsControllerTest {
     }
 
     @Test
-    public void shouldCreateAccount1() throws Exception {
+    public void shouldCreateAccount() throws Exception {
         doNothing().when(accountService).createAccount(any(CustomerDto.class));
 
         mockMvc.perform(post("/api/create")
